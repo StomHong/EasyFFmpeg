@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 String inputurl = folderurl + "/" + urltext_input;
 
 //		        String outputurl=urlEdittext_output.getText().toString();
-                String outputurl = "rtmp://video-center.alivecdn.com/LHLive/682346?vhost=b.letfox.com";
+                String outputurl = "";
 
                 Log.e("inputurl", inputurl);
                 Log.e("outputurl", outputurl);
