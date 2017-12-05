@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EasyFFmpeg.iml" filepath="$PROJECT_DIR$/EasyFFmpeg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/EasyFFmpeg.iml" filepath="$PROJECT_DIR$/.idea/EasyFFmpeg.iml" />
+      <module fileurl="file://D:\work\EasyFFmpeg\EasyFFmpeg.iml" filepath="D:\work\EasyFFmpeg\EasyFFmpeg.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
