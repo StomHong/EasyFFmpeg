@@ -16,73 +16,29 @@ cmake_minimum_required(VERSION 3.4.1)
 include_directories( ${CMAKE_SOURCE_DIR}/src/main/cpp/include/)
 
 #生成lib名称(可以随便起)
-add_library( # Sets the name of the library.
-             simplest_ffmpeg_streamer
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             src/main/cpp/simplest_ffmpeg_streamer.c )
+add_library( easyffmpeg SHARED src/main/cpp/decoder.c)
 
 #作为支持库
-add_library( avcodec-56 SHARED IMPORTED )
-add_library( avdevice-56 SHARED IMPORTED )
-add_library( avfilter-5 SHARED IMPORTED )
-add_library( avformat-56 SHARED IMPORTED )
-add_library( avutil-54 SHARED IMPORTED )
-add_library( postproc-53 SHARED IMPORTED )
-add_library( swresample-1 SHARED IMPORTED )
-add_library( swscale-3 SHARED IMPORTED )
+add_library( avcodec-57 SHARED IMPORTED )
+set_target_properties(avcodec-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavcodec-57.so)
 
-set_target_properties(
-    avcodec-56
-    PROPERTIES IMPORTED_LOCATION
-    ${CMAKE_SOURCE_DIR}/libs/armeabi/libavcodec-56.so
-    )
+add_library( avdevice-57 SHARED IMPORTED )
+set_target_properties(avdevice-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavdevice-57.so)
 
-set_target_properties(
-        avfilter-5
-        PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/libs/armeabi/libavfilter-5.so
-        )
+add_library( avfilter-6 SHARED IMPORTED )
+set_target_properties(avfilter-6 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavfilter-6.so)
 
-set_target_properties(
-            avformat-56
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libavformat-56.so
-            )
+add_library( avformat-57 SHARED IMPORTED )
+set_target_properties(avformat-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavformat-57.so)
 
-set_target_properties(
-            avutil-54
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libavutil-54.so
-            )
+add_library( avutil-55 SHARED IMPORTED )
+set_target_properties(avutil-55 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavutil-55.so)
 
-set_target_properties(
-            swresample-1
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libswresample-1.so
-             )
+add_library( swresample-2 SHARED IMPORTED )
+set_target_properties(swresample-2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libswresample-2.so)
 
-set_target_properties(
-            swscale-3
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libswscale-3.so
-             )
-
-
-set_target_properties(
-            postproc-53
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libpostproc-53.so
-             )
-
-set_target_properties(
-            avdevice-56
-            PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_SOURCE_DIR}/libs/armeabi/libavdevice-56.so
-             )
+add_library( swscale-4 SHARED IMPORTED )
+set_target_properties(swscale-4 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libswscale-4.so)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -102,16 +58,14 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                         simplest_ffmpeg_streamer
-                         avdevice-56
-                         avcodec-56
-                         avfilter-5
-                         avformat-56
-                         avutil-54
-                         swresample-1
-                         swscale-3
-                         postproc-53
-
+                         easyffmpeg
+                         avdevice-57
+                         avcodec-57
+                         avfilter-6
+                         avformat-57
+                         avutil-55
+                         swresample-2
+                         swscale-4
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )

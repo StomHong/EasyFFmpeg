@@ -4,63 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.stomhong.easyav.MainActivity"
+    tools:context="com.stomhong.easyffmpeg.MainActivity"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text_label1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Input Bitstream" />
+    <android.opengl.GLSurfaceView
+        android:id="@+id/glsurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <EditText
-        android:id="@+id/input_url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/text_label1"
-        android:layout_below="@+id/text_label1"
-        android:ems="100"
-        android:inputType="textUri"
-        android:text="sintel.mp4"
-        android:textColor="#ff8c00"
-        />
-
-    <TextView
-        android:id="@+id/text_label2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/input_url"
-        android:layout_below="@+id/input_url"
-        android:text="Output URL" />
-
-    <EditText
-        android:id="@+id/output_url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/text_label2"
-        android:layout_below="@+id/text_label2"
-        android:ems="200"
-        android:inputType="textUri"
-        android:text="rtmp://www.velab.com.cn/live/test"
-        android:textColor="#ff8c00"
-        />
-
-    <Button
-        android:id="@+id/button_start"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/output_url"
-        android:layout_below="@+id/output_url"
-        android:text="Start" />
-
-    <TextView
-        android:id="@+id/text_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button_start"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/output_url"
-        android:layout_below="@+id/button_start"
-        android:text="TextView" />
 </LinearLayout>

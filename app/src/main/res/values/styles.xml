@@ -7,5 +7,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <!-- 星星等级样式-->
+    <style name="RatingStarStyle" parent="Widget.AppCompat.RatingBar">
+        <item name="android:progressDrawable">@mipmap/common_grade_nor</item>
+        <item name="android:secondaryProgress">@mipmap/common_grade_pre</item>
+        <item name="android:minHeight">16dp</item>
+        <item name="android:maxHeight">16dp</item>
+        <item name="android:minWidth">18dp</item>
+        <item name="android:maxWidth">18dp</item>
+        <item name="android:isIndicator">true</item>
+        <item name="android:numStars">5</item>
+        <item name="android:rating">2</item>
+    </style>
 </resources>
