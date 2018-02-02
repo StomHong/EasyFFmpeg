@@ -3,19 +3,17 @@ package com.stomhong.easyffmpeg.opengl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.os.Environment;
 import android.util.Log;
 
-import com.stomhong.easyffmpeg.R;
-
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.Buffer;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -31,7 +29,10 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class MyRenderer implements GLSurfaceView.Renderer {
 
+    private static final String tag = MyRenderer.class.getSimpleName();
+
     private byte[] mData = new byte[]{};
+    private int mWidth,mHeight;
     private int index = 0;
     private GLSurfaceView mGlSurfaceView;
 
@@ -84,6 +85,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private Context mContext;
     private int mTexCoordHandle;
     private int mTexSamplerHandle;
+
 
     public MyRenderer(Context context, GLSurfaceView glSurfaceView) {
         this.mGlSurfaceView = glSurfaceView;
@@ -177,20 +179,20 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         int[] texNames = new int[1];
         GLES20.glGenTextures(1, texNames, 0);
         mTexName = texNames[0];
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher);
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexName);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_REPEAT);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_REPEAT);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-        bitmap.recycle();
+//        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R);
+//
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexName);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+//                GLES20.GL_LINEAR);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
+//                GLES20.GL_LINEAR);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+//                GLES20.GL_REPEAT);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+//                GLES20.GL_REPEAT);
+//        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+//        bitmap.recycle();
     }
 
     @Override
@@ -199,6 +201,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         int[] texNames = new int[1];
         GLES20.glGenTextures(1, texNames, 0);
         mTexName = texNames[0];
+        if (mData.length == 0)
+            return;
+
         Bitmap bitmap = BitmapFactory.decodeByteArray(mData, 0, mData.length);
 
         if (bitmap != null) {
@@ -213,6 +218,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
                     GLES20.GL_REPEAT);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
                     GLES20.GL_REPEAT);
+
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
             bitmap.recycle();
         }
@@ -226,14 +232,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,
                 GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
-
 //        sendImage(100,100);
     }
 
-    public void update(byte[] data) {
-
-        this.mData = data;
-
+    public void update(byte[] dataY, int width ,int height) {
+        this.mData = dataY;
+        this.mWidth = width;
+        this.mHeight = height;
         this.mGlSurfaceView.requestRender();
     }
 

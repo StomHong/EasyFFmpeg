@@ -29,5 +29,7 @@ public class RecordActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
     }
 
+    public native void record();
+
 
 }

@@ -1,14 +1,5 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
-
-# Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
-
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
 
 #set(lib_src_DIR ${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
 
@@ -16,7 +7,7 @@ cmake_minimum_required(VERSION 3.4.1)
 include_directories( ${CMAKE_SOURCE_DIR}/src/main/cpp/include/)
 
 #生成lib名称(可以随便起)
-add_library( easyffmpeg SHARED src/main/cpp/decoder.c)
+add_library( easyffmpeg SHARED src/main/cpp/decode_video.c src/main/cpp/decode_video2.c src/main/cpp/decode_audio.c)
 
 #作为支持库
 add_library( avcodec-57 SHARED IMPORTED )
@@ -40,24 +31,12 @@ set_target_properties(swresample-2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_D
 add_library( swscale-4 SHARED IMPORTED )
 set_target_properties(swscale-4 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libswscale-4.so)
 
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
+add_library( yuv SHARED IMPORTED )
+set_target_properties(yuv PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libyuv.so)
 
-find_library( # Sets the name of the path variable.
-              log-lib
+find_library(log-lib log )
 
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
-
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
+target_link_libraries(
                          easyffmpeg
                          avdevice-57
                          avcodec-57
@@ -66,6 +45,9 @@ target_link_libraries( # Specifies the target library.
                          avutil-55
                          swresample-2
                          swscale-4
-                       # Links the target library to the log library
-                       # included in the NDK.
+                         yuv
+                         android
+                         EGL
+                         GLESv2
+                         OpenSLES
                        ${log-lib} )
