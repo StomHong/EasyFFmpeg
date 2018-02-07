@@ -50,6 +50,11 @@ static short *resampleBuf = NULL;
 uint8_t *out_buffer;
 int out_channer_nb;
 
+// pointer and size of the next player buffer to enqueue, and number of remaining buffers
+void *nextBuffer;
+static unsigned int nextSize;
+static int nextCount;
+
 //ffmpeg部分
 AVFormatContext *pFormatCtx = NULL;
 AVCodec *pCodec = NULL;
@@ -58,6 +63,10 @@ AVPacket *pPacket;
 AVFrame *pFrame;
 SwrContext *swrContext;
 int audioStream = 0;
+
+void createBufferQueueAudioPlayer(jint sampleRate, jint bufSize);
+
+void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 
 /**
  * 一般来说，媒体播放有这几个步骤：解协议-->解封装-->解码-->视音频同步
@@ -69,7 +78,7 @@ int audioStream = 0;
  * @param _url      视频地址
  */
 
-JNIEXPORT  void JNICALL
+JNIEXPORT JNICALL void
 Java_com_stomhong_easyffmpeg_AudioActivity_play
         (JNIEnv *env, jobject instance) {
 
@@ -111,10 +120,8 @@ Java_com_stomhong_easyffmpeg_AudioActivity_play
         return;
     }
 
-    //初始化AVPacket
-    AVPacket *pPacket = av_packet_alloc();
-    //初始化AVFrame
-    AVFrame *pFrame = av_frame_alloc();
+    pFrame = av_frame_alloc();
+    pPacket = av_packet_alloc();
 
     //    mp3  里面所包含的编码格式   转换成  pcm   SwcContext
     swrContext = swr_alloc();
@@ -137,16 +144,10 @@ Java_com_stomhong_easyffmpeg_AudioActivity_play
     swr_init(swrContext);
 //    获取通道数  2
     out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
-    *rate = pCodecCtx->sample_rate;
-    *channel = pCodecCtx->channels;
+//    *rate = pCodecCtx->sample_rate;
+//    *channel = pCodecCtx->channels;
+    createBufferQueueAudioPlayer(pCodecCtx->sample_rate,pCodecCtx->channels);
 
-
-    //释放资源
-    av_frame_free(&pFrame);
-    av_packet_unref(pPacket);
-
-    avformat_close_input(&pFormatCtx);
-    avformat_free_context(pFormatCtx);
 }
 
 int getPCM(void **pcm,size_t *pcm_size){
@@ -161,10 +162,6 @@ int getPCM(void **pcm,size_t *pcm_size){
                 av_packet_unref(pPacket);
                 continue;
             }
-//            swr_init()
-//            swr_convert()
-//            swr_get_out_samples()
-//            av_get_bytes_per_sample();
 
             while (avcodec_receive_frame(pCodecCtx, pFrame) == 0) {
                 LOGE("读取音频:%d", index++);
@@ -177,9 +174,8 @@ int getPCM(void **pcm,size_t *pcm_size){
                                                       AV_SAMPLE_FMT_S16, 1);
                 *pcm = out_buffer;
                 *pcm_size = size;
-                break;
 
-                usleep(1000 * 10);
+//                usleep(1000 * 40);
 
             }
 
@@ -191,7 +187,7 @@ int getPCM(void **pcm,size_t *pcm_size){
 
 // create the engine and output mix objects
 //创建引擎和混响对象
-void Java_com_stomhong_easyffmpeg_AudioActivity_createEngine(JNIEnv* env, jclass clazz)
+JNIEXPORT JNICALL void Java_com_stomhong_easyffmpeg_AudioActivity_createEngine(JNIEnv* env, jclass clazz)
 {
     SLresult result;
 
@@ -232,23 +228,115 @@ void Java_com_stomhong_easyffmpeg_AudioActivity_createEngine(JNIEnv* env, jclass
     LOGE("执行到这");
 }
 
-void * pcmBufferCallBack(SLAndroidBufferQueueItf bf, void * context)
+// create buffer queue audio player
+void createBufferQueueAudioPlayer(jint sampleRate, jint bufSize)
 {
-    //assert(NULL == context);
-    getPCM(&buffer);
-    // for streaming playback, replace this test by logic to find and fill the next buffer
-    if (NULL != buffer) {
-        SLresult result;
-        // enqueue another buffer
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, buffer, 44100 * 2 * 2);
-        // the most likely other result is SL_RESULT_BUFFER_INSUFFICIENT,
-        // which for this code example would indicate a programming error
+    SLresult result;
+    if (sampleRate >= 0 && bufSize >= 0 ) {
+        bqPlayerSampleRate = sampleRate * 1000;
+        /*
+         * device native buffer size is another factor to minimize audio latency, not used in this
+         * sample: we only play one giant buffer here
+         */
+        bqPlayerBufSize = bufSize;
     }
+
+    // configure audio source
+    SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
+    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 1, SL_SAMPLINGRATE_8,
+                                   SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+                                   SL_SPEAKER_FRONT_CENTER, SL_BYTEORDER_LITTLEENDIAN};
+    /*
+     * Enable Fast Audio when possible:  once we set the same rate to be the native, fast audio path
+     * will be triggered
+     */
+    if(bqPlayerSampleRate) {
+        format_pcm.samplesPerSec = bqPlayerSampleRate;       //sample rate in mili second
+    }
+    SLDataSource audioSrc = {&loc_bufq, &format_pcm};
+
+    // configure audio sink
+    SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSink audioSnk = {&loc_outmix, NULL};
+
+    /*
+     * create audio player:
+     *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
+     *     for fast audio case
+     */
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_EFFECTSEND,
+            /*SL_IID_MUTESOLO,*/};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+            /*SL_BOOLEAN_TRUE,*/ };
+
+    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
+                                                bqPlayerSampleRate? 2 : 3, ids, req);
+
+    (void)result;
+
+    // realize the player
+    result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
+
+    (void)result;
+
+    // get the play interface
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
+
+    (void)result;
+
+    // get the buffer queue interface
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
+                                             &bqPlayerBufferQueue);
+
+    (void)result;
+
+    // register callback on the buffer queue
+    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
+
+    (void)result;
+
+    // get the effect send interface
+    bqPlayerEffectSend = NULL;
+    if( 0 == bqPlayerSampleRate) {
+        result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
+                                                 &bqPlayerEffectSend);
+        (void)result;
+    }
+
+#if 0   // mute/solo is not supported for sources that are known to be mono, as this is
+    // get the mute/solo interface
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_MUTESOLO, &bqPlayerMuteSolo);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+#endif
+
+    // get the volume interface
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
+    (void)result;
+
+    // set the player's state to playing
+    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    (void)result;
+
+    //开始播放
+    bqPlayerCallback(bqPlayerBufferQueue,NULL);
+}
+
+//size_t nextSize =0;
+//void *nextBuffer;
+// this callback handler is called every time a buffer finishes playing
+void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
+{
+    getPCM(&nextBuffer,&nextSize);
+    if(nextBuffer!=NULL&&nextSize!=0) {
+        (*bq)->Enqueue(bq, nextBuffer, nextSize);
+    }
+
 }
 
 
 // shut down the native audio system
-void Java_com_stomhong_easyffmpeg_AudioActivity_stop(JNIEnv* env, jclass clazz)
+JNIEXPORT JNICALL void Java_com_stomhong_easyffmpeg_AudioActivity_stop(JNIEnv* env, jclass clazz)
 {
 
     // destroy buffer queue audio player object, and invalidate all associated interfaces
@@ -297,4 +385,13 @@ void Java_com_stomhong_easyffmpeg_AudioActivity_stop(JNIEnv* env, jclass clazz)
     }
 
 //    pthread_mutex_destroy(&audioEngineLock);
+}
+
+JNIEXPORT JNICALL void Java_com_stomhong_easyffmpeg_AudioActivity_destroy(JNIEnv* env, jclass clazz){
+    //    //释放资源
+    av_frame_free(&pFrame);
+    av_packet_unref(pPacket);
+
+    avformat_close_input(&pFormatCtx);
+    avformat_free_context(pFormatCtx);
 }

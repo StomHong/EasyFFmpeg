@@ -37,7 +37,14 @@ public class AudioActivity extends AppCompatActivity {
         });
     }
 
-    public static native void play();
-    public static native int stop();
-    public static native void createEngine();
+    @Override
+    protected void onDestroy() {
+        destroy();
+        super.onDestroy();
+    }
+
+    public  native void play();
+    public  native int stop();
+    public  native void createEngine();
+    public native void destroy();
 }
