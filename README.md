@@ -1,5 +1,6 @@
 # EasyFFmpeg
 
-目前是将雷神的推流demo重新使用Android NDK开发，采用cmake编译。
-原文链接http://blog.csdn.net/leixiaohua1020/article/details/47056051
+目前已经完成了ffmpeg解码视频、音频，视频播放采用ANativeWindow，音频播放采用OpenSL ES。后续会改用OpenGL ES播放视频。
+最后实现音视频同步。
+持续更新中...
 
