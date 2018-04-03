@@ -24,13 +24,18 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".MediaPlayerActivity" />
-        <activity android:name=".PlayerActivity"></activity>
-        <activity android:name=".Player2Activity">
+        <activity android:name=".VideoANativeWindowActivity">
+
+        </activity>
+        <activity android:name=".VideoOpenGLActivity">
 
         </activity>
         <activity android:name=".RecordActivity" />
         <activity android:name=".StreamActivity" />
-        <activity android:name=".AudioActivity">
+        <activity android:name=".AudioOpenSLActivity">
+
+        </activity>
+        <activity android:name=".AudioAudioTrackActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

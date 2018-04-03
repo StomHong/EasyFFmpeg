@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 
@@ -17,14 +15,14 @@ import java.io.File;
 /**
  * 播放器页面 OpenGLES 渲染
  */
-public class Player2Activity extends AppCompatActivity{
+public class VideoOpenGLActivity extends AppCompatActivity{
 
-    private static final String TAG = Player2Activity.class.getSimpleName();
+    private static final String TAG = VideoOpenGLActivity.class.getSimpleName();
 
     //加载库文件
-    static {
-        System.loadLibrary("easyffmpeg");
-    }
+//    static {
+//        System.loadLibrary("easyffmpeg");
+//    }
 
    private GLSurfaceView mGLSurfaceView;
     MyRenderer mRenderer;

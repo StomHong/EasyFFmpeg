@@ -40,7 +40,7 @@
  * @param _url      视频地址
  */
 
-JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_Player2Activity_setDataResource
+JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_VideoOpenGLActivity_setDataResource
         (JNIEnv *env, jobject instance, jstring _url) {
 
     const char *url = "/storage/emulated/0/sintel.mp4";

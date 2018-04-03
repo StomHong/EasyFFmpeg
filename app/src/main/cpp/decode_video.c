@@ -33,7 +33,7 @@
  * @param _url      视频地址
  */
 
-JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_PlayerActivity_setDataResource
+JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_VideoANativeWindowActivity_setDataResource
         (JNIEnv *env, jobject instance, jobject surface) {
 
     char *url = "/storage/emulated/0/sintel.mp4";
@@ -70,7 +70,7 @@ JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_PlayerActivity_setDataResou
 
     //初始化解码器上下文
     AVCodecContext *pCodecCtx = avcodec_alloc_context3(pCodec);
-    avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[0]->codecpar);
+    avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoStream]->codecpar);
     int err = avcodec_open2(pCodecCtx, pCodec, NULL);
     if (err < 0) {
         char buf[1024] = {0};
@@ -99,7 +99,7 @@ JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_PlayerActivity_setDataResou
 
     unsigned int index = 0;
     //循环读取数据帧
-    while (av_read_frame(pFormatCtx, pPacket) >= 0) {
+    while (av_read_frame(pFormatCtx, pPacket) == 0) {
         //如果是视频数据包
         if (pPacket->stream_index == videoStream) {
             int pkt_ret = avcodec_send_packet(pCodecCtx, pPacket);
@@ -124,7 +124,7 @@ JNIEXPORT  void JNICALL Java_com_stomhong_easyffmpeg_PlayerActivity_setDataResou
                                                         NULL,
                                                         NULL);
 
-            while (avcodec_receive_frame(pCodecCtx, pFrame) >= 0) {
+            if (avcodec_receive_frame(pCodecCtx, pFrame) >= 0) {
                 LOGE("读取视频帧:%d", index++);
                 ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
 

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class AudioActivity extends AppCompatActivity {
+public class AudioOpenSLActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("easyffmpeg");

@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.4.1)
 include_directories( ${CMAKE_SOURCE_DIR}/src/main/cpp/include/)
 
 #生成lib名称(可以随便起)
-add_library( easyffmpeg SHARED src/main/cpp/decode_video.c src/main/cpp/decode_video2.c src/main/cpp/decode_audio.c)
+add_library( easyffmpeg SHARED src/main/cpp/decode_video.c src/main/cpp/decode_video2.c src/main/cpp/decode_audio2.c src/main/cpp/decode_audio.c)
 
 #作为支持库
 add_library( avcodec-57 SHARED IMPORTED )
@@ -36,8 +36,7 @@ set_target_properties(yuv PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/
 
 find_library(log-lib log )
 
-target_link_libraries(
-                         easyffmpeg
+target_link_libraries(   easyffmpeg
                          avdevice-57
                          avcodec-57
                          avfilter-6

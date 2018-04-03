@@ -1,26 +1,16 @@
 package com.stomhong.easyffmpeg;
 
-import android.opengl.GLSurfaceView;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.QuickContactBadge;
-
-import com.stomhong.easyffmpeg.opengl.MyRenderer;
-
-import java.io.File;
 
 /**
  * 播放器页面 ANativeWindow渲染
  */
-public class PlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback{
+public class VideoANativeWindowActivity extends AppCompatActivity implements SurfaceHolder.Callback{
 
-    private static final String TAG = PlayerActivity.class.getSimpleName();
+    private static final String TAG = VideoANativeWindowActivity.class.getSimpleName();
 
     //加载库文件
     static {
