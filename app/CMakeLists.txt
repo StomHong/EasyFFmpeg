@@ -11,28 +11,28 @@ add_library( easyffmpeg SHARED src/main/cpp/decode_video.c src/main/cpp/decode_v
 
 #作为支持库
 add_library( avcodec-57 SHARED IMPORTED )
-set_target_properties(avcodec-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavcodec-57.so)
+set_target_properties(avcodec-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libavcodec-57.so)
 
 add_library( avdevice-57 SHARED IMPORTED )
-set_target_properties(avdevice-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavdevice-57.so)
+set_target_properties(avdevice-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libavdevice-57.so)
 
 add_library( avfilter-6 SHARED IMPORTED )
-set_target_properties(avfilter-6 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavfilter-6.so)
+set_target_properties(avfilter-6 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libavfilter-6.so)
 
 add_library( avformat-57 SHARED IMPORTED )
-set_target_properties(avformat-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavformat-57.so)
+set_target_properties(avformat-57 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libavformat-57.so)
 
 add_library( avutil-55 SHARED IMPORTED )
-set_target_properties(avutil-55 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libavutil-55.so)
+set_target_properties(avutil-55 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libavutil-55.so)
 
 add_library( swresample-2 SHARED IMPORTED )
-set_target_properties(swresample-2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libswresample-2.so)
+set_target_properties(swresample-2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libswresample-2.so)
 
 add_library( swscale-4 SHARED IMPORTED )
-set_target_properties(swscale-4 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libswscale-4.so)
+set_target_properties(swscale-4 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libswscale-4.so)
 
 add_library( yuv SHARED IMPORTED )
-set_target_properties(yuv PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi/libyuv.so)
+set_target_properties(yuv PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libyuv.so)
 
 find_library(log-lib log )
 
